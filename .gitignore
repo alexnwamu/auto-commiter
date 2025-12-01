@@ -3,6 +3,10 @@
 .env.*
 *.env
 
+
+# .gitignore
+__pycache__/
+*.pyc
 # Python bytecode / caches
 __pycache__/
 *.py[cod]

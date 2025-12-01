@@ -16,14 +16,10 @@ def get_staged_diff():
 
 def get_branch_name():
     try:
-        result = (
-            subprocess.run(
-                ["git", "branch", "--show-current"], capture_output=True, text=True
-            )
-            .decode("utf-8")
-            .strip()
+        result = subprocess.run(
+            ["git", "branch", "--show-current"], capture_output=True, text=True
         )
-        return result
+        return result.stdout.strip()
     except subprocess.CalledProcessError:
         return "unknown"
 

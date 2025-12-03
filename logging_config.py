@@ -11,3 +11,5 @@ for your CLI tool so you can easily turn debug information on or off.
 #   that the CLI calls once at startup.
 # - You might read the desired log level from an environment variable or
 #   a CLI flag (e.g. `--verbose`).
+
+

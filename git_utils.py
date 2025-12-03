@@ -48,3 +48,16 @@ def commit_diff(commit_message: str):
         return True
     except subprocess.CalledProcessError:
         return False
+
+
+def push_branch():
+    try:
+        subprocess.run(
+            ["git", "push"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False

@@ -1,24 +1,3 @@
-"""Core orchestration logic for generating commit messages.
-
-This file should act as the glue between:
-- Git utilities (for fetching the staged diff).
-- Model backends (OpenAI, Hugging Face, rule-based, etc.).
-- Any formatting or post-processing of the final commit message.
-"""
-
-# Hints:
-# - A common pattern is to define a function like
-#     generate_commit_message(style: str | None = None) -> str
-#   which is called by your CLI.
-# - Inside that function, you might:
-#   1. Fetch the staged diff using a helper from `git_utils`.
-#   2. Build a prompt using a helper from `formatting`.
-#   3. Select a model/strategy (e.g. via a function from `strategies`).
-#   4. Call the model to get a commit message string.
-#   5. Optionally apply some final cleanup or validation.
-# - Try to keep this file free of direct OpenAI/HF calls; those belong in
-#   the `models/` package. This keeps your architecture clean and testable.
-
 from git_utils import get_staged_diff, get_branch_name
 from models.openai_chat import OpenAIModel
 

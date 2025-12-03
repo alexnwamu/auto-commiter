@@ -1,18 +1,69 @@
-"""CLI entry point for the AI commit message generator.
+import argparse
+import sys
 
-This file should:
-- Parse command-line arguments (e.g. style/strategy flags, dry-run, etc.).
-- Call into your core orchestration logic to generate a commit message.
-- Print the final message or optionally run `git commit -m "<message>"`.
-"""
+from core import generate_commit_message
+from git_utils import add_staged_diff, commit_diff, push_branch
 
-# Hints:
-# - Consider using the built-in `argparse` module for flags like:
-#   - `--style` / `--strategy` to choose OpenAI vs. rule-based vs. other backends.
-#   - `--dry-run` to only print the suggestion without committing.
-# - Implement a `main()` function that:
-#   1. Parses CLI arguments.
-#   2. Calls into your core module (e.g. a `generate_commit_message` function).
-#   3. Handles errors nicely (no staged changes, missing API key, etc.).
-# - Wire this file up in `pyproject.toml` under `[project.scripts]`, e.g.:
-#   ai-commit = "cli:main"
+
+def _choose_message(options: list[str]) -> str:
+    print("\nSelect a commit message:\n")
+    for idx, msg in enumerate(options, start=1):
+        print(f"Option {idx}:")
+        print(msg)
+        print("-" * 40)
+
+    while True:
+        choice = input("Enter 1 or 2 (or 'q' to cancel): ").strip()
+        if choice in {"1", "2"}:
+            return options[int(choice) - 1]
+        if choice.lower() in {"q", "quit"}:
+            return ""
+        print("Invalid choice. Please enter 1, 2, or 'q'.")
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Auto-commiter: generate, commit, and push with AI messages.",
+    )
+    parser.add_argument(
+        "--style",
+        default="conventional",
+        help="Commit message style (e.g. conventional).",
+    )
+
+    args = parser.parse_args(argv)
+
+    print("[cli] Staging all changes (git add --all)...")
+    if not add_staged_diff():
+        print("[cli] Failed to stage changes. Aborting.")
+        return 1
+
+    print("[cli] Generating two commit message options...")
+    msg1 = generate_commit_message(style=args.style)
+    msg2 = generate_commit_message(style=args.style)
+
+    if not msg1 or not msg2:
+        print("[cli] Failed to generate commit messages. Aborting.")
+        return 1
+
+    chosen = _choose_message([msg1, msg2])
+    if not chosen:
+        print("[cli] Commit cancelled by user.")
+        return 0
+
+    print("[cli] Committing with selected message...")
+    if not commit_diff(chosen):
+        print("[cli] git commit failed. Aborting before push.")
+        return 1
+
+    print("[cli] Pushing current branch...")
+    if not push_branch():
+        print("[cli] git push failed. Please check your remote configuration.")
+        return 1
+
+    print("[cli] Commit and push completed successfully.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

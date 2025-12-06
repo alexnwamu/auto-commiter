@@ -3,7 +3,7 @@ from models.openai_chat import OpenAIModel
 from models.rule_based import RuleBasedModel
 
 
-MAX_RULE_BASED_DIFF_CHARS = 7800
+MAX_RULE_BASED_DIFF_CHARS = 5000
 
 
 def generate_commit_message(style: str | None = None):

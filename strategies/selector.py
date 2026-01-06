@@ -13,3 +13,15 @@ def select_style(style: str) -> str:
         return style
     else:
         raise ValueError(f"Invalid style: {style}")
+
+
+def seelct_model(model: str) -> str:
+    model = model.lower()
+    models = [
+        "openai",
+        "huggingface",
+    ]
+    if model in models:
+        return model
+    else:
+        raise ValueError(f"Invalid model: {model}")
